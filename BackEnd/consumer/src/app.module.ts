@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
-// import { EmilService } from './email.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
-// Import the Email files 
-import { EmailModule } from './email/email.module';
+// Import the Email files
 import { EmailController } from './email/email.controller';
-import { EmailService } from './email/email.service';
 import { Email } from './email/email.entity';
+import { EmailModule } from './email/email.module';
+import { EmailService } from './email/email.service';
 
 @Module({
   imports: [

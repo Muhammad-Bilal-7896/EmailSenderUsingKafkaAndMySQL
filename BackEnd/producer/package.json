@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "wait-db": "./wait-db.sh && yarn start:dev",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -24,12 +25,16 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/microservices": "^10.1.0",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/platform-socket.io": "^10.1.2",
     "@nestjs/platform-ws": "^10.1.1",
     "@nestjs/typeorm": "^10.0.0",
+    "@nestjs/websockets": "^10.1.2",
     "kafkajs": "^2.2.4",
     "mysql": "^2.18.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
+    "socket.io": "^4.7.1",
+    "typeorm": "^0.3.17",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

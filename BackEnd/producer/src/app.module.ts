@@ -5,6 +5,8 @@ import { EmailController } from './email/email.controller';
 import { EmailService } from './email/email.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Email } from './email/email.entity';
+import { GatewayModule } from './gateway/gateway.module';
+import { MyGateWay } from './gateway/gateway';
 
 @Module({
   imports: [
@@ -24,7 +26,7 @@ import { Email } from './email/email.entity';
       },
     ]),
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'mysql', // Corrected 'type' value to 'mysql'
       host: 'localhost',
       port: 3306,
       username: 'root',
@@ -35,8 +37,9 @@ import { Email } from './email/email.entity';
     }),
     TypeOrmModule.forFeature([Email]),
     EmailModule,
+    GatewayModule,
   ],
   controllers: [EmailController],
-  providers: [EmailService],
+  providers: [EmailService, MyGateWay],
 })
 export class AppModule {}

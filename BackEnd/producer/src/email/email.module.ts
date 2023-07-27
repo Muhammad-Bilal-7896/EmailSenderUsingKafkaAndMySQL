@@ -4,9 +4,12 @@ import { EmailController } from './email.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Email } from './email.entity';
+import { MyGateWay } from 'src/gateway/gateway';
+import { GatewayModule } from 'src/gateway/gateway.module';
 
 @Module({
   imports: [
+    GatewayModule,
     ClientsModule.register([
       {
         name: 'any_name_i_want',
@@ -36,6 +39,6 @@ import { Email } from './email.entity';
     EmailModule,
   ],
   controllers: [EmailController],
-  providers: [EmailService],
+  providers: [EmailService, MyGateWay],
 })
 export class EmailModule {}

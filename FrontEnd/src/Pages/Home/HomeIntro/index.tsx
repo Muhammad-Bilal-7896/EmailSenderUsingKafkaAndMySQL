@@ -5,7 +5,7 @@ const HomeIntro = () => {
   const styles = {
     titleStyles: {
       fontSize: "2rem",
-      marginTop: "2rem",
+      marginTop: "1rem",
     },
     descriptionStyles: {
       textAlign: "left",

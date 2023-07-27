@@ -15,10 +15,7 @@ export class Email {
   subject: string;
 
   @Column()
-  text: string;
-
-  @Column()
-  html: string;
+  body: string;
 
   @Column()
   timeSent: string;

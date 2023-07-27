@@ -1,7 +1,5 @@
 // email.entity.ts
-import { UUID } from 'crypto';
-import { Entity, Column, PrimaryColumn, BeforeInsert } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Email {
@@ -15,10 +13,7 @@ export class Email {
   subject: string;
 
   @Column()
-  text: string;
-
-  @Column()
-  html: string;
+  body: string;
 
   @Column()
   timeSent: string;

@@ -1,38 +1,38 @@
-import { useState } from "react";
 import { Button, TextField, Typography } from "@mui/material";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import SnackBar from "../../../components/SnackBar";
 
 import { styles } from "./styles";
 
-const FormComponent = () => {
-  ///////////////////////////////// Snackbar State /////////////////////////////////
+interface PropsFormComponent {
+  moveToTop: () => void;
+}
+
+const FormComponent = ({ moveToTop }: PropsFormComponent) => {
+  // SnackBar
   const [snackBarHandler, setSnackBarHandler] = useState({
     open: false,
     message: "",
     severity: "success",
   });
-  ///////////////////////////////// Snackbar State /////////////////////////////////
 
-  // Data For API
-  const [emailId, setEmailId] = useState<string>("");
+  // numEmails
   const [numEmails, setNumEmails] = useState("");
-  const [emailSubject, setEmailSubject] = useState<string>("");
-  const [emailText, setEmailText] = useState<string>("");
-  const [emailHtml, setEmailHtml] = useState<string>("");
-  //
 
   const [status, setStatus] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleSendClick = async () => {
-    if (!emailId || !numEmails || !emailSubject || !emailText || !emailHtml) {
+    moveToTop();
+
+    if (!numEmails) {
       setSnackBarHandler(
         // Spread the previous state
         {
           ...snackBarHandler,
           open: true,
-          message: `Please Fill All Fields`,
+          message: `Please Enter the number of Emails to Continue`,
           severity: "error",
         }
       );
@@ -42,19 +42,31 @@ const FormComponent = () => {
     try {
       setLoading(true);
 
+      let emailId = "example@gmail.com";
+      let subject =
+        "NEST JS + KAFKA + MYSQL + SOCKET IO FULL STACK DEVELOPMENT";
+      let body = `<div>
+      <h1>Full stack Development with NEST JS</h1>
+      <p>
+      NEST JS is a full stack development framework
+      </p>
+      </div>`;
+
+      let EmailBody = {
+        to: emailId,
+        numEmails: parseInt(numEmails),
+        subject: subject,
+        body: body,
+      };
+
       let url = "http://localhost:3001/email/produceEmail";
       const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          to: emailId,
-          numEmails: parseInt(numEmails),
-          subject: emailSubject,
-          text: emailText,
-          html: `<div>${emailHtml}</div>`,
-        }),
+
+        body: JSON.stringify(EmailBody),
       });
 
       const data = await response.json();
@@ -91,6 +103,15 @@ const FormComponent = () => {
       setLoading(false);
     }
   };
+
+  const submitForm = () => {
+    moveToTop();
+
+    setTimeout(() => {
+      handleSendClick();
+    }, 1000);
+  };
+
   return (
     <div>
       <form
@@ -113,57 +134,6 @@ const FormComponent = () => {
           />
         </div>
         <br />
-        <div>
-          <TextField
-            type="text"
-            label="Send Email to"
-            variant="standard"
-            value={emailId}
-            onChange={(e) => setEmailId(e.target.value)}
-            sx={styles.inputStyles}
-            fullWidth
-          />
-        </div>
-        <br />
-        <div>
-          <TextField
-            type="text"
-            label="Subject"
-            variant="standard"
-            value={emailSubject}
-            onChange={(e) => setEmailSubject(e.target.value)}
-            sx={styles.inputStyles}
-            fullWidth
-          />
-        </div>
-        <br />
-        <div>
-          <TextField
-            type="text"
-            label="Email Text"
-            variant="standard"
-            multiline
-            rows={4}
-            value={emailText}
-            onChange={(e) => setEmailText(e.target.value)}
-            sx={styles.inputStyles}
-            fullWidth
-          />
-        </div>
-
-        <div>
-          <TextField
-            type="text"
-            label="Email Body"
-            variant="standard"
-            multiline
-            rows={4}
-            value={emailHtml}
-            onChange={(e) => setEmailHtml(e.target.value)}
-            sx={styles.inputStyles}
-            fullWidth
-          />
-        </div>
       </form>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -173,7 +143,7 @@ const FormComponent = () => {
       >
         <Button
           variant="contained"
-          onClick={handleSendClick}
+          onClick={submitForm}
           disabled={loading}
           sx={styles.buttonStyles}
         >
@@ -196,11 +166,8 @@ const FormComponent = () => {
         isOpen={snackBarHandler.open}
         message={snackBarHandler.message}
         severity={snackBarHandler.severity}
-        setIsOpen={
-          // Only pass the setIsOpen function to the SnackBar component
-          // and not the whole state object
-          (isOpen: boolean) =>
-            setSnackBarHandler({ ...snackBarHandler, open: isOpen })
+        setIsOpen={(isOpen: boolean) =>
+          setSnackBarHandler({ ...snackBarHandler, open: isOpen })
         }
       />
     </div>

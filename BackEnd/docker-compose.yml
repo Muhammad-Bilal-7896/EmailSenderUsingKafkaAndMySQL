@@ -1,4 +1,4 @@
-version: '2'
+version: "3"
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -6,14 +6,14 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - 22181:2181
+      - "22181:2181"
 
   kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
     ports:
-      - 29092:29092
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -27,8 +27,35 @@ services:
     depends_on:
       - kafka
     ports:
-      - 8080:8080
+      - "8080:8080"
     environment:
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+  mysql:
+    image: mariadb:10.5.10
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123321123
+      MYSQL_USER: root
+      MYSQL_DATABASE: email_sender_db
+      MYSQL_PASSWORD: 123321123
+    ports:
+      - "3306:3306"
+
+  producer:
+    build: ./producer
+    depends_on:
+      - mysql
+      - kafka
+    ports:
+      - "3001:3001"
+    # command: sh -c "./producer/wait-db.sh && yarn start:dev"
+
+  consumer:
+    build: ./consumer
+    depends_on:
+      - mysql
+      - kafka
+    # command: sh -c "./producer/wait-db.sh && yarn start:dev"

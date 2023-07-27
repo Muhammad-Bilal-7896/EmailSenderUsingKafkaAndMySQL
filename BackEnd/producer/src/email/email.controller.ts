@@ -1,6 +1,6 @@
-import { Controller, Get, Inject, Post, Body } from '@nestjs/common';
-import { EmailService } from './email.service';
+import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
+import { EmailService } from './email.service';
 
 @Controller('email')
 export class EmailController {
@@ -10,9 +10,7 @@ export class EmailController {
   ) {}
 
   async onModuleInit() {
-    ['medium.rocks'].forEach((key) =>
-      this.client.subscribeToResponseOf(`${key}`),
-    );
+    ['mail'].forEach((key) => this.client.subscribeToResponseOf(`${key}`));
     await this.client.connect();
   }
 
@@ -43,7 +41,7 @@ export class EmailController {
 
   @Get('/kafka-producer')
   kafkaProducerEndpoint() {
-    return this.emailService.kafkaProducer(); 
+    return this.emailService.kafkaProducer();
   }
 
   @Post('/produceEmail')
