@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 import { MyGateWay } from 'src/gateway/gateway';
 import { Repository } from 'typeorm';
 import { Email } from './email.entity';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class EmailService {
@@ -13,6 +14,7 @@ export class EmailService {
     @InjectRepository(Email)
     private readonly emailRepository: Repository<Email>,
     private readonly myGateway: MyGateWay,
+    private dataSource: DataSource,
   ) {}
 
   // For Socket.io
@@ -25,6 +27,10 @@ export class EmailService {
 
   getHello(): string {
     return 'Hello World From Produce Email!';
+  }
+
+  getUsers() {
+    return this.dataSource.query('SELECT * FROM users');
   }
 
   kafkaProducer(): any {

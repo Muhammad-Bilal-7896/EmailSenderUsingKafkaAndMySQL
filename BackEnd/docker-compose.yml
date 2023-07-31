@@ -1,5 +1,23 @@
 version: "3"
 services:
+  mysql-db:
+    container_name: mysql-db
+    image: mysql:5.7
+    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      MYSQL_ROOT_PASSWORD: 123321123
+    ports:
+      - 3307:3307
+    volumes:
+      - mysql-volume:/var/lib/mysql:rw
+      - ./mysql-db:/docker-entrypoint-initdb.d/
+    networks:
+      - default
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
@@ -17,7 +35,7 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://192.168.18.66:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -33,29 +51,83 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
 
-  mysql:
-    image: mariadb:10.5.10
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: 123321123
-      MYSQL_USER: root
-      MYSQL_DATABASE: email_sender_db
-      MYSQL_PASSWORD: 123321123
-    ports:
-      - "3306:3306"
+  # producer:
+  #   build:
+  #     context: ./producer
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - mysql-db
+  #     - kafka
+  #   ports:
+  #     - "3001:3001"
+  #   volumes:
+  #     - ./producer:/app
+  #     - /app/node_modules
+  #   networks:
+  #     - default
+  #   # command: sh -c "./producer/wait-db.sh && yarn start:dev"
 
-  producer:
+  # consumer:
+  #   build:
+  #     context: ./consumer
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - mysql-db
+  #     - kafka
+  #   volumes:
+  #     - ./consumer:/app
+  #     - /app/node_modules
+  #   networks:
+  #     - default
+  #   # command: sh -c "./producer/wait-db.sh && yarn start:dev"
+
+  producer-app:
+    container_name: producer
+    # depends_on:
+    #   - mysql-db
     build: ./producer
+    restart: unless-stopped
+    env_file: ./.env
     depends_on:
-      - mysql
+      - mysql-db
       - kafka
     ports:
-      - "3001:3001"
-    # command: sh -c "./producer/wait-db.sh && yarn start:dev"
+      - $NESTJS_APP_LOCAL_PORT:$NESTJS_APP_DOCKER_PORT
+    environment:
+      - DB_HOST=$MYSQLDB_HOST
+      - DB_USER=$MYSQLDB_USER
+      - DB_PASSWORD=$MYSQLDB_PASSWORD
+      - DB_DATABASE=$MYSQLDB_DATABASE
+      - DB_PORT=$MYSQLDB_DOCKER_PORT
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./producer:/app
+      - /app/node_modules
+    networks:
+      - default
 
-  consumer:
-    build: ./consumer
+  consumer-app:
+    container_name: consumer
     depends_on:
-      - mysql
+      - mysql-db
       - kafka
-    # command: sh -c "./producer/wait-db.sh && yarn start:dev"
+    build: ./consumer
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - DB_HOST=$MYSQLDB_HOST
+      - DB_USER=$MYSQLDB_USER
+      - DB_PASSWORD=$MYSQLDB_PASSWORD
+      - DB_DATABASE=$MYSQLDB_DATABASE
+      - DB_PORT=$MYSQLDB_DOCKER_PORT
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./consumer:/app
+      - /app/node_modules
+    networks:
+      - default
+
+volumes:
+  mysql-volume:

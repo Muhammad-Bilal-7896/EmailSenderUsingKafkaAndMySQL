@@ -1,0 +1,20 @@
+{
+  "name": "dockerized-full-stack-environment",
+  "version": "1.0.0",
+  "description": "Dockerized environment with a database, a back-end and a front-end application.",
+  "scripts": {
+    "build:back": "docker-compose build nestjs-app",
+    "build:front": "docker-compose build nextjs-app",
+    "start:db": "docker-compose up mysql-db",
+    "start:back": "docker-compose up nestjs-app --renew-anon-volumes",
+    "start:front": "docker-compose up nextjs-app --renew-anon-volumes",
+    "clean": "docker-compose down -v"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "run-script-webpack-plugin": "^0.2.0",
+    "webpack": "^5.88.2",
+    "webpack-node-externals": "^3.0.0"
+  }
+}

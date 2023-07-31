@@ -44,6 +44,11 @@ export class EmailController {
     return this.emailService.kafkaProducer();
   }
 
+  @Get('/users')
+  getUsers() {
+    return this.emailService.getUsers();
+  }
+
   @Post('/produceEmail')
   async produceEmail(@Body() emailData: any) {
     return this.emailService.produceEmail(emailData);

@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Email } from './email/email.entity';
 import { GatewayModule } from './gateway/gateway.module';
 import { MyGateWay } from './gateway/gateway';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { MyGateWay } from './gateway/gateway';
         options: {
           client: {
             clientId: 'any_client_id_i_want',
-            brokers: ['localhost:29092'],
+            brokers: ['kafka:29092'],
           },
           consumer: {
             groupId: 'an_unique_string_id',
@@ -25,15 +26,21 @@ import { MyGateWay } from './gateway/gateway';
         },
       },
     ]),
-    TypeOrmModule.forRoot({
-      type: 'mysql', // Corrected 'type' value to 'mysql'
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '123321123',
-      database: 'email_sender_db',
-      entities: [Email],
-      synchronize: true,
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        name: 'default',
+        type: 'mysql',
+        host: configService.get('DB_HOST'),
+        port: +configService.get('DB_PORT'),
+        username: configService.get('DB_USER'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_DATABASE'),
+        entities: [Email],
+        synchronize: false,
+      }),
     }),
     TypeOrmModule.forFeature([Email]),
     EmailModule,
