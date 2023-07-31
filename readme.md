@@ -58,6 +58,11 @@ And send the request. If sent successfully you will see the following response:
 
 To verify if emails are being sent please navigate to the consumer terminal and there you will find that each and every email sent by producer is being consumed by consumer and then the status of it is also updated in the mysql database table in email table.
 
+<video width="800" controls>
+  <source src="./ReadmeMaterial/postmandemo.mp4" type="video/mp4">
+  Your browser does not support HTML video.
+</video>
+
 ## Conclusion
 
 This email app uses kafka to make the process of bulk email sending smooth and easy.
