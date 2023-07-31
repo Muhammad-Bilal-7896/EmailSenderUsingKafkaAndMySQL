@@ -129,5 +129,26 @@ services:
     networks:
       - default
 
+  front_end:
+    container_name: front_end
+    depends_on:
+      - consumer-app
+      - producer-app
+    build:
+      context: ./front_end
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - $REACTJS_APP_LOCAL_PORT:$REACTJS_APP_DOCKER_PORT
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./front_end:/app
+      - /app/node_modules
+      - /app/.react
+    networks:
+      - default
+
 volumes:
   mysql-volume:
