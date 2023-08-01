@@ -50,6 +50,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         database: configService.get('DB_DATABASE'),
         entities: [Email],
         synchronize: false,
+        logginng:true
       }),
     }),
     TypeOrmModule.forFeature([Email]),

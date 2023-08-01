@@ -15,6 +15,10 @@ async function bootstrap() {
     },
   );
 
+  const app2 = await NestFactory.create(AppModule);
+
+  app2.enableCors();
+
   await app.listen();
 }
 bootstrap();
